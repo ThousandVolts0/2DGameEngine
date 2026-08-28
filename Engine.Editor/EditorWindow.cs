@@ -7,17 +7,17 @@ using Silk.NET.OpenGL.Extensions.ImGui;
 using Silk.NET.Windowing;
 using System.Drawing;
 
-namespace GameEngine
+namespace Engine.Editor
 {
-    public class Engine
+    public class EditorWindow
     {
         private IWindow _window;
-        private ILogger<Engine> _logger;
+        private ILogger<EditorWindow> _logger;
         private ImGuiController _controller;
         private IInputContext _input;
         private GL _gl;
 
-        public Engine(IWindow window, ILogger<Engine> logger)
+        public EditorWindow(IWindow window, ILogger<EditorWindow> logger)
         {
             _window = window;
             _logger = logger;
@@ -29,7 +29,7 @@ namespace GameEngine
             _input = _window.CreateInput();
             _controller = new ImGuiController(_gl, _window, _input);
 
-            _logger.LogInformation("Engine loaded");
+            _logger.LogInformation("Editor loaded");
         }
 
         public void OnUpdate(double deltaTime)

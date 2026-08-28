@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Engine.Editor/Engine.Editor.csproj" Id="945d889b-46f3-4d49-ab07-00c18197251e" />
+  <Project Path="Engine.Runtime/Engine.Runtime.csproj" Id="f1580e7f-f591-4f2f-921f-beaea860f9e6" />
+</Solution>

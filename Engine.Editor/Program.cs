@@ -7,7 +7,7 @@ using Silk.NET.OpenGL;
 using Silk.NET.OpenGL.Extensions.ImGui;
 using Silk.NET.Windowing;
 
-namespace GameEngine
+namespace Engine.Editor
 {
     internal class Program
     {
@@ -26,17 +26,17 @@ namespace GameEngine
             var window = Window.Create(windowOptions);
 
             services.AddLogging(config => config.AddConsole());
-            services.AddSingleton<Engine>();
+            services.AddSingleton<EditorWindow>();
             services.AddSingleton<IWindow>(window);
 
             var serviceProvider = services.BuildServiceProvider();
-            var engine = serviceProvider.GetRequiredService<Engine>();
+            var editorWindow = serviceProvider.GetRequiredService<EditorWindow>();
 
-            window.Load += engine.OnLoad;
-            window.Update += engine.OnUpdate;
-            window.Render += engine.OnRender;
-            window.Closing += engine.OnClosing;
-            window.Resize += engine.OnResize;
+            window.Load += editorWindow.OnLoad;
+            window.Update += editorWindow.OnUpdate;
+            window.Render += editorWindow.OnRender;
+            window.Closing += editorWindow.OnClosing;
+            window.Resize += editorWindow.OnResize;
 
             window.Run();
             window.Dispose();
