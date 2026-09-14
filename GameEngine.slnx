@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="src/Editor/Editor.csproj" Id="945d889b-46f3-4d49-ab07-00c18197251e" />
-  <Project Path="src/Runtime/Runtime.csproj" Id="f1580e7f-f591-4f2f-921f-beaea860f9e6" />
+  <Project Path="src/Engine.Tests/Engine.Tests.csproj" Id="89e7d2fa-2735-4599-bb39-4eff215b42d8" />
   <Project Path="src/Engine/Engine.csproj" Id="44b218d2-5340-4024-b0f9-69cd13660ee4" />
+  <Project Path="src/Runtime/Runtime.csproj" Id="f1580e7f-f591-4f2f-921f-beaea860f9e6" />
 </Solution>

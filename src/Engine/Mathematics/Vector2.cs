@@ -1,4 +1,6 @@
-﻿namespace Engine.Mathematics
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Engine.Mathematics
 {
     public struct Vector2
     {
@@ -51,12 +53,44 @@
             return new Vector2(a.x * b, a.y * b);
         }
 
+        public static Vector2 operator *(float a, Vector2 b)
+        {
+            return new Vector2(b.x * a, b.y * a);
+        }
+
+        // Component-wise multiplication
+        public static Vector2 operator *(Vector2 a, Vector2 b)
+        {
+            return new Vector2(a.x * b.x, a.y * b.y);
+        }
+
         public static Vector2 operator /(Vector2 a, float b)
         {
             return new Vector2(a.x / b, a.y / b);
         }
 
-        public static Vector2 Dot(Vector2 a, Vector2 b) => new Vector2(a.x * b.x, a.y * b.y);
+        public static Vector2 operator /(float a, Vector2 b)
+        {
+            return new Vector2(b.x / a, b.y / a);
+        }
+
+        // Component-wise division
+        public static Vector2 operator /(Vector2 a, Vector2 b)
+        {
+            return new Vector2(a.x / b.x, a.y / b.y);
+        }
+
+        public static bool operator ==(Vector2 a, Vector2 b)
+        {
+            return a.x == b.x && a.y == b.y;
+        }
+
+        public static bool operator !=(Vector2 a, Vector2 b)
+        {
+            return a.x != b.x || a.y != b.y;
+        }
+
+        public static float Dot(Vector2 a, Vector2 b) => a.x * b.x + a.y * b.y;
 
         public static Vector2 Zero => new Vector2(0, 0);
         public static Vector2 One => new Vector2(1, 1);
@@ -69,6 +103,14 @@
         public static Vector2 Left => new Vector2(-1, 0);
 
         public override string ToString() => $"({x}, {y})";
+        public override bool Equals([NotNullWhen(true)] object? obj)
+        {
+            return obj is Vector2 vec && this == vec;
+        }
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(x, y);
+        }
     }
 
 }
