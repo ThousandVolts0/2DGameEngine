@@ -1,10 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Silk.NET.Input;
 using Silk.NET.Maths;
-using Silk.NET.OpenGL;
-using Silk.NET.OpenGL.Extensions.ImGui;
 using Silk.NET.Windowing;
 
 namespace Engine.Editor
