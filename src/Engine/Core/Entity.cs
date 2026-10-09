@@ -21,7 +21,7 @@ namespace Engine.Core
 
         public Entity() { }
 
-        public void AddComponent(IComponent component)
+        public void Attach(IComponent component)
         {
             Type type = component.GetType();
             if (HasComponent(type))
@@ -30,7 +30,7 @@ namespace Engine.Core
             _components.Add(component);
         }
 
-        public void AddComponent<T>() where T : IComponent, new()
+        public void Attach<T>() where T : IComponent, new()
         {
            if (HasComponent<T>())
                 throw new InvalidOperationException($"Component of type {typeof(T).Name} already exists in entity {Name}.");
@@ -41,8 +41,8 @@ namespace Engine.Core
         public bool HasComponent<T>() where T : IComponent => _components.Any(c => c.GetType() == typeof(T));
         public bool HasComponent(Type type)  => _components.Any(c => c.GetType() == type);
 
-        public void RemoveComponent(IComponent component) => _components.Remove(component); 
-        public void RemoveComponent<T>() where T : IComponent
+        public void Detach(IComponent component) => _components.Remove(component); 
+        public void Detach<T>() where T : IComponent
         {
             var component = _components.FirstOrDefault(c => c is T);
             if (component != null)

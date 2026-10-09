@@ -9,6 +9,7 @@ namespace Engine.Components
 
         private Vector2 _scale = Vector2.One;
         public ref Vector2 Scale => ref _scale;
+
         public float Rotation { get; set; } = 0;
     }
 }

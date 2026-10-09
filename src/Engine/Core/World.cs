@@ -1,7 +1,8 @@
 ﻿namespace Engine.Core
 {
-    public class Scene
+    public class World
     {
+        public World() { }
         private Dictionary<int, Entity> _entities = new Dictionary<int, Entity>();
         public Entity? GetEntityByName(string name) => _entities.Values.FirstOrDefault(e => e.Name == name);
         public Entity? GetEntityById(int id) => _entities.ContainsKey(id) ? _entities[id] : null;

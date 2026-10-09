@@ -1,6 +1,4 @@
 ﻿namespace Engine.Components
 {
-    public interface IComponent
-    {
-    }
+    public interface IComponent { }
 }

@@ -1,9 +1,11 @@
-﻿using Engine.Rendering;
+﻿using Engine.Content;
+using Engine.Data;
 
 namespace Engine.Components
 {
     public class Renderer : IComponent
     {
-        public RenderObject Object { get; set; }
+        public Mesh MeshData { get; set; }
+        public MaterialData Material { get; set; }
     }
 }

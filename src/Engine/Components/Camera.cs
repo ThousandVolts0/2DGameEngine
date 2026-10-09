@@ -1,5 +1,6 @@
 ﻿using Silk.NET.Maths;
 using Engine.Rendering;
+using System.Drawing;
 
 namespace Engine.Components
 {
@@ -9,8 +10,11 @@ namespace Engine.Components
         public float NearPlane { get; set; } = 0.1f;
         public float FarPlane { get; set; } = 100.0f;
 
-        public Matrix4X4<float> GetProjectionMatrix(Viewport view)
+        public NormalizedViewport ViewportRect { get; set; } = NormalizedViewport.FullScreen;
+
+        public Matrix4X4<float> GetProjectionMatrix(Size windowSize)
         {
+            Viewport view = ViewportRect * windowSize;
             float aspectRatio = (float)view.Width / view.Height;
             float left = -aspectRatio * OrthographicSize;
             float right = aspectRatio * OrthographicSize;
