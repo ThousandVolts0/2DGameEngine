@@ -1,13 +1,10 @@
-﻿using Engine.Core;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Silk.NET.Maths;
+﻿using Silk.NET.Maths;
 using Silk.NET.OpenGL;
-using System.Drawing;
 using Silk.NET.Windowing;
+using System.Drawing;
 using Engine.Graphics;
 
-namespace Runtime
+namespace Engine.Core.Game
 {
     public class Game
     {
@@ -52,7 +49,7 @@ namespace Runtime
         public void OnRender(double dt)
         {
             Services.Graphics.Clear(Color.AliceBlue);
-            Services.RenderPipeline.Render(Services.Worlds.ActiveWorld);
+            Services.RenderPipeline.Render(Services.Worlds.ActiveCanvas);
             Services.Window.SwapBuffers();
         }
 
@@ -65,5 +62,8 @@ namespace Runtime
         {
             
         }
+
+        public static GameBuilder Create() => new GameBuilder();
     }
+
 }

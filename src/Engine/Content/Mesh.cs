@@ -38,7 +38,6 @@
             Vertices = CreateCircularVertices(32),
             Indices = CreateCircularIndicies(32)
         };
-
         public static Mesh Hexagon => new Mesh()
         {
             Vertices = CreateCircularVertices(6),

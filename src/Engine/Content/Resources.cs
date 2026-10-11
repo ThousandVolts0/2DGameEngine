@@ -1,8 +1,4 @@
-﻿using System.IO;
-using System.Runtime.InteropServices.Marshalling;
-using StbImageSharp;
-using Engine.Content.Loaders;
-using System.Diagnostics;
+﻿using Engine.Content.Loaders;
 
 namespace Engine.Content
 {

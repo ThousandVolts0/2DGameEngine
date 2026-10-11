@@ -17,14 +17,14 @@ namespace Engine.Rendering
             _window = window;
         }
 
-        public void Render(World world)
+        public void Render(Canvas world)
         {
             foreach (Camera camera in world.GetEntities().Where(e => e.HasComponent<Camera>()).Select(e => e.GetComponent<Camera>()!))
             {
                 Size windowSize = new Size(_window.Size.X, _window.Size.Y);
                 _device.SetViewport(camera.ViewportRect * windowSize);
 
-                foreach (Entity entity in world.GetEntities().Where(e => e.HasComponent<Renderer>()))
+                foreach (Element entity in world.GetEntities().Where(e => e.HasComponent<Renderer>()))
                 {
                     Renderer renderer = entity.GetComponent<Renderer>()!;
                     _device.Draw(renderer.MeshData, renderer.Material, camera.GetProjectionMatrix(windowSize));

@@ -1,10 +1,10 @@
-﻿using Engine.Mathematics;
-using Silk.NET.Maths;
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
 
-namespace Runtime
+namespace Engine.Core.Game
 {
-    public class GameSettings
+    public class GameWindowSettings
     {
         public int Width { get; set; } = 1000;
         public int Height { get; set; } = 600;

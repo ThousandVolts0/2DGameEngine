@@ -2,8 +2,8 @@
 {
     public class GPUMesh
     {
-        public uint VAO { get; init; }
-        public uint VBO { get; init; }
-        public uint EBO { get; init; }
+        public required uint VAO { get; init; }
+        public required uint VBO { get; init; }
+        public required uint EBO { get; init; }
     }
 }
