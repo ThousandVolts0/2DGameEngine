@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using Silk.NET.OpenGL;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Engine.Mathematics
 {
@@ -111,6 +112,7 @@ namespace Engine.Mathematics
         {
             return obj is Vector2 vec && this == vec;
         }
+
         public override int GetHashCode()
         {
             return HashCode.Combine(X, Y);

@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Engine.Core;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Engine.Components
 {
-    public class ImageLabel : IComponent
+    public sealed class ImageLabel : Component
     {
-        
     }
 }

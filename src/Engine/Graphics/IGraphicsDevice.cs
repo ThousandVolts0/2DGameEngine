@@ -1,14 +1,16 @@
-﻿using Engine.Rendering;
-using System.Drawing;
-using Silk.NET.Maths;
+﻿using Engine.Content;
 using Engine.Data;
-using Engine.Content;
+using Engine.Rendering;
+using Silk.NET.Maths;
+using Silk.NET.OpenGL;
+using System.Drawing;
 
 namespace Engine.Graphics
 {
     public interface IGraphicsDevice
     {
-        void Clear(Color color);
+        void SetClearColor(Color color);
+        void Clear();
         void Initialize(object context);
         void SetViewport(Viewport view);
 

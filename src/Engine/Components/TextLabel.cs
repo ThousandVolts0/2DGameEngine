@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Engine.Components
 {
-    public class TextLabel : IComponent
+    public sealed class TextLabel : Component
     {
     }
 }

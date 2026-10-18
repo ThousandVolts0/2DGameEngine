@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <None Include="Content\Material.cs" />
+	<InternalsVisibleTo Include="Engine.Tests" />
   </ItemGroup>
 
 </Project>

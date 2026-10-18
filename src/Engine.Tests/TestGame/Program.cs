@@ -1,12 +1,10 @@
 ﻿using Engine;
 using Engine.Components;
-using Engine.Rendering;
+using Engine.Content;
 using Engine.Core;
-using Microsoft.Extensions.Options;
-using System.Numerics;
 using Engine.Core.Game;
-using Engine.Mathematics;
-using Vector2 = Engine.Mathematics.Vector2;
+using Microsoft.Extensions.DependencyModel;
+using Microsoft.Extensions.Logging;
 
 namespace TestGame
 {
@@ -14,15 +12,28 @@ namespace TestGame
     {
         static void Main(string[] args)
         {
-            Element player = new Element("Player")
-                .Attach<Transform>();
+            Entity player = new Entity("Player")
+                .Attach(new Transform());
 
-            Canvas canvas = new Canvas("Main")
-                .AddElement(player);
+            Scene main = new Scene("Main")
+                .AddEntity(player);
 
             Game game = Game.Create()
-                .Window(800, 600, "Test game")
+                .WindowOptions(options =>
+                {
+                    options.Height = 600;
+                    options.Width = 1000;
+                    options.Title = "Sample game";
+                })
+                .Logging(logging =>
+                {
+                    logging.SetMinimumLevel(LogLevel.Debug);
+                    logging.AddConsole();
+                })
+                .StartingScene(main)
                 .Build();
+
+            game.Run();
         }
     }
 }

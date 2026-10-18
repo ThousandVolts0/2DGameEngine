@@ -1,46 +1,60 @@
 ﻿using Engine.Rendering;
-using Runtime;
 using Silk.NET.Maths;
 using Silk.NET.Windowing;
 using Engine.Graphics;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using Silk.NET.Input;
 
 namespace Engine.Core.Game
 {
     public class GameBuilder
     {
-        private GameSettings _settings = new GameSettings();
+        private readonly GameSettings _settings = new();
+        private Action<ILoggingBuilder>? _configureLogging = null;
+        private Scene? _activeScene = null;
 
-        public GameBuilder Window(int width, int height, string title = "New Game")
+        public GameBuilder WindowOptions(Action<GameWindowSettings> configure)
         {
-            _settings.Window.Width = width;
-            _settings.Window.Height = height;
-            _settings.Window.Title = title;
+            configure?.Invoke(_settings.Window);
+            return this;
+        }
+
+        public GameBuilder StartingScene(Scene scene)
+        {
+            _activeScene = scene;
+            return this;
+        }
+
+        public GameBuilder Logging(Action<ILoggingBuilder> configure)
+        {
+            _configureLogging = configure;
             return this;
         }
 
         public Game Build()
         {
-            WindowOptions windowOptions = WindowOptions.Default with
+            if (_activeScene == null)
+                throw new ArgumentNullException("The active scene has not been set");
+
+            WindowOptions windowOptions = Silk.NET.Windowing.WindowOptions.Default with
             {
                 Size = new Vector2D<int>(_settings.Window.Width, _settings.Window.Height),
                 Title = _settings.Window.Title,
                 VSync = _settings.Window.UseVSync,
             };
 
-            IWindow window = Silk.NET.Windowing.Window.Create(windowOptions);
+            IWindow window = Window.Create(windowOptions);
+
             IGraphicsDevice graphicsDevice = new OpenGLGraphicsDevice();
-            CanvasRegistry canvasRegistry = new CanvasRegistry();
-            RenderPipeline renderPipeline = new RenderPipeline(graphicsDevice, window);
+            RenderPipeline renderPipeline = new(graphicsDevice, window);
+            SceneManager sceneManager = new(_activeScene);
 
-            GameServices services = new GameServices
-            {
-                Window = window,
-                Canvases = canvasRegistry,
-                Graphics = graphicsDevice,
-                RenderPipeline = renderPipeline
-            };
+            ILoggerFactory loggerFactory = NullLoggerFactory.Instance;
+            if (_configureLogging != null)
+                loggerFactory = LoggerFactory.Create(_configureLogging);
 
-            Game game = new Game(_settings, services);
+            Game game = new Game(_settings, window, sceneManager, renderPipeline, graphicsDevice, loggerFactory);
             return game;
         }
     }

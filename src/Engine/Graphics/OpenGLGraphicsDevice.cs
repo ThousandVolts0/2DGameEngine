@@ -51,10 +51,14 @@ namespace Engine.Graphics
             _gl.Viewport((int)view.X, (int)view.Y, (uint)view.Width, (uint)view.Height);
         }
 
-        public void Clear(Color color)
+        public void Clear()
+        {
+            _gl.Clear(ClearBufferMask.ColorBufferBit);
+        }
+
+        public void SetClearColor(Color color)
         {
             _gl.ClearColor(color);
-            _gl.Clear(ClearBufferMask.ColorBufferBit);
         }
 
         private uint CreateVAO()

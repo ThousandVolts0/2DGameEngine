@@ -22,10 +22,10 @@ namespace Engine.Rendering
         public static Viewport operator *(NormalizedViewport viewport, Size size)
         {
             return new Viewport(
-                x: viewport.X * size.Width,
-                y: viewport.Y * size.Height,
-                width: viewport.Width * size.Width,
-                height: viewport.Height * size.Height
+                viewport.X * size.Width,
+                viewport.Y * size.Height,
+                viewport.Width * size.Width,
+                viewport.Height * size.Height
             );
         }
     }

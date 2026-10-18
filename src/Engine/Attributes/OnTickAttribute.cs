@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Engine.Events
+namespace Engine.Attributes
 {
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-    public class EventAttribute : Attribute
+    public class OnTickAttribute : Attribute
     {
-        public EventAttribute()
+        public OnTickAttribute()
         {
         }
     }
