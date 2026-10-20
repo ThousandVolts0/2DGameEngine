@@ -6,6 +6,13 @@ namespace Engine.Content
     {
         public required float[] Vertices { get; init; }
         public required uint[] Indices { get; init; }
+        public Mesh(float[] vertices, uint[] indices)
+        {
+            Vertices = vertices;
+            Indices = indices;
+        }
+
+        public Mesh() { }
 
         public static Mesh Quad => new Mesh()
         {

@@ -1,17 +1,16 @@
 ﻿using Engine.Content;
 using Engine.Core;
 using Engine.Data;
+using Engine.Rendering;
 
 namespace Engine.Components
 {
     public sealed class Renderer : Component
     {
-        public Mesh Mesh { get; }
-        public Material Material { get; }
-        public Renderer(Mesh mesh, Material material)
+        public MeshRenderInfo Info { get; }
+        public Renderer(MeshRenderInfo info)
         {
-            Mesh = mesh;
-            Material = material;
+            Info = info;
         }
     }
 }

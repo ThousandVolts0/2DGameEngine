@@ -8,8 +8,8 @@ namespace Engine.Rendering
 {
     public class RenderPipeline
     {
-        private IGraphicsDevice _graphicsDevice;
-        private IWindow _window;
+        private readonly IGraphicsDevice _graphicsDevice;
+        private readonly IWindow _window;
 
         public RenderPipeline(IGraphicsDevice graphicsDevice, IWindow window)
         {
@@ -26,7 +26,7 @@ namespace Engine.Rendering
                 _graphicsDevice.SetViewport(newViewport);
 
                 foreach (Renderer renderer in scene.GetComponentsOfTypeInEntities<Renderer>())
-                    _graphicsDevice.Draw(renderer.Mesh, renderer.Material, camera.GetProjectionMatrix(windowSize));
+                    _graphicsDevice.Draw(renderer.Info, camera.GetProjectionMatrix(windowSize));
             }
         }
     }

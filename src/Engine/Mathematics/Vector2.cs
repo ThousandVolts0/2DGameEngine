@@ -1,4 +1,4 @@
-﻿using Silk.NET.OpenGL;
+﻿using Silk.NET.Maths;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Engine.Mathematics
@@ -73,11 +73,6 @@ namespace Engine.Mathematics
             return new Vector2(a.X / b, a.Y / b);
         }
 
-        public static Vector2 operator /(float a, Vector2 b)
-        {
-            return new Vector2(b.X / a, b.Y / a);
-        }
-
         // Component-wise division
         public static Vector2 operator /(Vector2 a, Vector2 b)
         {
@@ -106,6 +101,12 @@ namespace Engine.Mathematics
         public static Vector2 Down => new Vector2(0, -1);
         public static Vector2 Right => new Vector2(1, 0);
         public static Vector2 Left => new Vector2(-1, 0);
+
+        public static explicit operator System.Numerics.Vector2(Vector2 v) => new System.Numerics.Vector2(v.X, v.Y);
+        public static explicit operator Vector2(System.Numerics.Vector2 v) => new Vector2(v.X, v.Y);
+
+        public static explicit operator Vector2D<float>(Vector2 v) => new Vector2D<float>(v.X, v.Y);
+        public static explicit operator Vector2(Vector2D<float> v) => new Vector2(v.X, v.Y);
 
         public override string ToString() => $"({X}, {Y})";
         public override bool Equals([NotNullWhen(true)] object? obj)

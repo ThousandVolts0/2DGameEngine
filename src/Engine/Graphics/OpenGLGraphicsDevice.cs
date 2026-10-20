@@ -4,13 +4,14 @@ using System.Drawing;
 using Engine.Rendering;
 using Engine.Data;
 using Engine.Content;
+using Silk.NET.Windowing;
 
 namespace Engine.Graphics
 {
     public class OpenGLGraphicsDevice : IGraphicsDevice 
     {
         public OpenGLGraphicsDevice() { }
-        public void Initialize(object gl) => _gl = (GL)gl;
+        public void Initialize(IWindow window) => _gl = window.CreateOpenGL();
 
         private Dictionary<Mesh, GPUMesh> _loadedMeshes = new();
         private GL _gl = null!;
@@ -35,15 +36,18 @@ namespace Engine.Graphics
             return _loadedMeshes[data];
         }
 
-        public unsafe void Draw(Mesh data, Material material, Matrix4X4<float> proj)
+        public unsafe void Draw(MeshRenderInfo info, Matrix4X4<float> proj)
         {
-            GPUMesh mesh = _loadedMeshes.ContainsKey(data) ? _loadedMeshes[data] : LoadMesh(data);
+            Mesh mesh = info.Mesh;
+            Material material = info.Material;
+
+            GPUMesh gpuMesh = _loadedMeshes.ContainsKey(mesh) ? _loadedMeshes[mesh] : LoadMesh(mesh);
 
             material.Program.Use();
             material.Program.SetUniform("projection", proj);
 
-            _gl.BindVertexArray(mesh.VAO);
-            _gl.DrawElements(PrimitiveType.Triangles, (uint)data.Indices.Length, DrawElementsType.UnsignedInt, null);
+            _gl.BindVertexArray(gpuMesh.VAO);
+            _gl.DrawElements(PrimitiveType.Triangles, (uint)mesh.Indices.Length, DrawElementsType.UnsignedInt, null);
         }
 
         public void SetViewport(Viewport view)

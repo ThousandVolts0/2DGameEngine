@@ -11,6 +11,7 @@ namespace Engine.Core.Game
     public class GameBuilder
     {
         private readonly GameSettings _settings = new();
+
         private Action<ILoggingBuilder>? _configureLogging = null;
         private Scene? _activeScene = null;
 
