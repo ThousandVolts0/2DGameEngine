@@ -3,6 +3,9 @@ using Engine.Components;
 using Engine.Content;
 using Engine.Core;
 using Engine.Core.Game;
+using Engine.Core.Game.Abstractions;
+using Engine.Rendering;
+using Engine.Rendering.Shapes;
 using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.Logging;
 
@@ -12,28 +15,36 @@ namespace TestGame
     {
         static void Main(string[] args)
         {
-            Entity player = new Entity("Player")
-                .Attach(new Transform());
-
-            Scene main = new Scene("Main")
-                .AddEntity(player);
-
-            Game game = Game.Create()
-                .WindowOptions(options =>
+            Game game = new GameBuilder()
+                .Configure((settings) =>
                 {
-                    options.Height = 600;
-                    options.Width = 1000;
-                    options.Title = "Sample game";
+                    settings.Window.Width = 1000;
+                    settings.Window.Height = 600;
+                    settings.Window.Title = "Sample game";
+
+                    settings.Logging.MinimumLevel = LogLevel.Debug;
+                    settings.Logging.UseConsole = true;
                 })
-                .Logging(logging =>
-                {
-                    logging.SetMinimumLevel(LogLevel.Debug);
-                    logging.AddConsole();
-                })
-                .StartingScene(main)
+                .RegisterScene(new MainScene(), "Main")
+                .SetActiveScene("Main")
                 .Build();
 
             game.Run();
+        }
+    }
+
+    public class MainScene : Scene
+    {
+        protected override void OnInitialize(GameContext ctx)
+        {
+            var playerShape = new Circle();
+
+            Entity player = new Entity("Player")
+                .Attach(new Transform())
+                .Attach(new Renderer(playerShape))
+                .Attach(new Camera());
+
+            AddEntity(player);
         }
     }
 }

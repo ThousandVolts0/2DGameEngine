@@ -1,7 +1,11 @@
 ﻿using Engine.Components;
+using Engine.Content;
 using Engine.Core;
+using Engine.Data;
 using Engine.Graphics;
+using Microsoft.Extensions.Logging;
 using Silk.NET.Windowing;
+using System.ComponentModel;
 using System.Drawing;
 
 namespace Engine.Rendering
@@ -10,11 +14,19 @@ namespace Engine.Rendering
     {
         private readonly IGraphicsDevice _graphicsDevice;
         private readonly IWindow _window;
+        private readonly IResourceProvider _resources;
 
-        public RenderPipeline(IGraphicsDevice graphicsDevice, IWindow window)
+        private readonly ILogger<RenderPipeline> _logger;
+        public RenderPipeline(
+            IGraphicsDevice graphicsDevice, 
+            IWindow window,
+            ILogger<RenderPipeline> logger,
+            IResourceProvider resources)
         {
             _graphicsDevice = graphicsDevice;
             _window = window;
+            _logger = logger;
+            _resources = resources;
         }
 
         public void Render(Scene scene)
@@ -26,7 +38,12 @@ namespace Engine.Rendering
                 _graphicsDevice.SetViewport(newViewport);
 
                 foreach (Renderer renderer in scene.GetComponentsOfTypeInEntities<Renderer>())
-                    _graphicsDevice.Draw(renderer.Info, camera.GetProjectionMatrix(windowSize));
+                {
+                    Mesh mesh = renderer.Renderable.Mesh;
+                    Material material = renderer.Renderable.Material ?? _resources.Defaults.Materials.Unlit;
+                    _graphicsDevice.Draw(mesh, material, camera.GetProjectionMatrix(windowSize));
+                }
+                   
             }
         }
     }

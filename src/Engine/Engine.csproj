@@ -12,6 +12,7 @@
 	  <Content Include="Resources\**\*">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Content>
+	  <Compile Remove="Resources\Defaults\unlit.shader.cs" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.12" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.12" />
     <PackageReference Include="Silk.NET.Input" Version="2.23.0" />
@@ -25,7 +26,12 @@
 
   <ItemGroup>
     <None Include="Content\Material.cs" />
+    <None Include="Mathematics\Vector2Int.cs" />
 	<InternalsVisibleTo Include="Engine.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Resources\Defaults\Materials\" />
   </ItemGroup>
 
 </Project>

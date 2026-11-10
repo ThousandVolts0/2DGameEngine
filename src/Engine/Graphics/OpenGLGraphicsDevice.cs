@@ -5,16 +5,24 @@ using Engine.Rendering;
 using Engine.Data;
 using Engine.Content;
 using Silk.NET.Windowing;
+using Microsoft.Extensions.Logging;
+using Engine.Graphics.Shaders;
+using System.Numerics;
 
 namespace Engine.Graphics
 {
     public class OpenGLGraphicsDevice : IGraphicsDevice 
     {
-        public OpenGLGraphicsDevice() { }
         public void Initialize(IWindow window) => _gl = window.CreateOpenGL();
 
+        private readonly ILogger<OpenGLGraphicsDevice> _logger;
         private Dictionary<Mesh, GPUMesh> _loadedMeshes = new();
         private GL _gl = null!;
+
+        public OpenGLGraphicsDevice(ILogger<OpenGLGraphicsDevice> logger)
+        {
+            _logger = logger;
+        }
 
         private GPUMesh LoadMesh(Mesh data)
         {
@@ -24,7 +32,7 @@ namespace Engine.Graphics
 
             const uint posAttrib = 0;
             _gl.EnableVertexAttribArray(posAttrib);
-            _gl.VertexAttribPointer(posAttrib, 2, VertexAttribPointerType.Float, false, 2 * sizeof(float), 0); // 2D
+            _gl.VertexAttribPointer(posAttrib, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0); 
 
             _loadedMeshes[data] = new()
             {
@@ -36,18 +44,25 @@ namespace Engine.Graphics
             return _loadedMeshes[data];
         }
 
-        public unsafe void Draw(MeshRenderInfo info, Matrix4X4<float> proj)
+        public void Draw(Mesh mesh, Material material, Matrix4x4 proj)
         {
-            Mesh mesh = info.Mesh;
-            Material material = info.Material;
+            _logger.LogDebug("Drawing mesh: {Mesh} with material {Material}", mesh, material);
 
             GPUMesh gpuMesh = _loadedMeshes.ContainsKey(mesh) ? _loadedMeshes[mesh] : LoadMesh(mesh);
+            IShader shader = material.Shader;
 
-            material.Program.Use();
-            material.Program.SetUniform("projection", proj);
+            shader.Bind();
+            shader.SetUniform<Matrix4x4>("projection", proj);
 
             _gl.BindVertexArray(gpuMesh.VAO);
-            _gl.DrawElements(PrimitiveType.Triangles, (uint)mesh.Indices.Length, DrawElementsType.UnsignedInt, null);
+            _gl.DrawElements(PrimitiveType.Triangles, (uint)mesh.Indices.Length, DrawElementsType.UnsignedInt, ReadOnlySpan<uint>.Empty);
+        }
+
+        public IShader CreateShader(ShaderSource source)
+        {
+            uint vert = CreateShader(ShaderType.VertexShader, source.Vertex);
+            uint frag = CreateShader(ShaderType.FragmentShader, source.Fragment);
+            return new OpenGLShader(_gl, frag, vert);
         }
 
         public void SetViewport(Viewport view)

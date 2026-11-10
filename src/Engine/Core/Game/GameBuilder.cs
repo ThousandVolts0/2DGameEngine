@@ -3,42 +3,49 @@ using Silk.NET.Maths;
 using Silk.NET.Windowing;
 using Engine.Graphics;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-using Silk.NET.Input;
+using Engine.Content;
+using Engine.Content.Loaders;
+using Engine.Data;
+using Engine.Graphics.Shaders;
 
 namespace Engine.Core.Game
 {
     public class GameBuilder
     {
         private readonly GameSettings _settings = new();
+        private readonly Dictionary<string, Scene> _scenes = new();
+        private string _activeSceneId = "";
 
-        private Action<ILoggingBuilder>? _configureLogging = null;
-        private Scene? _activeScene = null;
-
-        public GameBuilder WindowOptions(Action<GameWindowSettings> configure)
+        public GameBuilder RegisterScene(Scene scene, string name)
         {
-            configure?.Invoke(_settings.Window);
+            if (_scenes.ContainsKey(name))
+                throw new ArgumentException($"Scene '{name}' is already registered.");
+
+            _scenes[name] = scene;
             return this;
         }
 
-        public GameBuilder StartingScene(Scene scene)
+        public GameBuilder SetActiveScene(string name)
         {
-            _activeScene = scene;
+            if (!_scenes.TryGetValue(name, out Scene? scene))
+                throw new ArgumentException($"Scene '{name}' is not registered.");
+
+            _activeSceneId = name;
             return this;
         }
 
-        public GameBuilder Logging(Action<ILoggingBuilder> configure)
+        public GameBuilder Configure(Action<GameSettings> configure)
         {
-            _configureLogging = configure;
+            configure(_settings);
             return this;
         }
 
         public Game Build()
         {
-            if (_activeScene == null)
+            if (_activeSceneId == null)
                 throw new ArgumentNullException("The active scene has not been set");
 
-            WindowOptions windowOptions = Silk.NET.Windowing.WindowOptions.Default with
+            WindowOptions windowOptions = WindowOptions.Default with
             {
                 Size = new Vector2D<int>(_settings.Window.Width, _settings.Window.Height),
                 Title = _settings.Window.Title,
@@ -47,15 +54,37 @@ namespace Engine.Core.Game
 
             IWindow window = Window.Create(windowOptions);
 
-            IGraphicsDevice graphicsDevice = new OpenGLGraphicsDevice();
-            RenderPipeline renderPipeline = new(graphicsDevice, window);
-            SceneManager sceneManager = new(_activeScene);
+            Action<ILoggingBuilder> config = (logger) =>
+            {
+                logger.SetMinimumLevel(_settings.Logging.MinimumLevel);
 
-            ILoggerFactory loggerFactory = NullLoggerFactory.Instance;
-            if (_configureLogging != null)
-                loggerFactory = LoggerFactory.Create(_configureLogging);
+                if (_settings.Logging.UseConsole)
+                    logger.AddConsole();
+            };
 
-            Game game = new Game(_settings, window, sceneManager, renderPipeline, graphicsDevice, loggerFactory);
+            ILoggerFactory loggerFactory = LoggerFactory.Create(config);
+
+            ILogger<OpenGLGraphicsDevice> graphicsLogger = loggerFactory.CreateLogger<OpenGLGraphicsDevice>();
+            ILogger<RenderPipeline> renderPipelineLogger = loggerFactory.CreateLogger<RenderPipeline>();
+            ILogger<SceneManager> sceneLogger = loggerFactory.CreateLogger<SceneManager>();
+
+            IGraphicsDevice graphicsDevice = new OpenGLGraphicsDevice(graphicsLogger);
+
+            Dictionary<Type, object> _resourceLoaders = new()
+            {
+                { typeof(Texture), new TextureResourceLoader(loggerFactory.CreateLogger<TextureResourceLoader>()) },
+                { typeof(Material), new MaterialResourceLoader(loggerFactory.CreateLogger<MaterialResourceLoader>()) },
+                { typeof(IShader), new ShaderResourceLoader(loggerFactory.CreateLogger<ShaderResourceLoader>(), graphicsDevice) }
+            };
+
+            IResourceProvider resources = new Resources(_resourceLoaders);
+            RenderPipeline renderPipeline = new(graphicsDevice, window, renderPipelineLogger, resources);
+            SceneManager sceneManager = new(sceneLogger);
+
+            foreach (var kvp in _scenes)
+                sceneManager.RegisterScene(kvp.Value, kvp.Key);
+
+            Game game = new(_settings, window, sceneManager, resources, renderPipeline, graphicsDevice, loggerFactory, _activeSceneId);
             return game;
         }
     }

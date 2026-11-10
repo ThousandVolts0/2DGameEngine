@@ -1,19 +1,33 @@
-﻿using Engine.Rendering.Shaders;
-using System.Drawing;
+﻿using Engine.Graphics.Shaders;
 
 namespace Engine.Data
 {
     public class Material
     {
-        public ShaderProgram Program { get; }
-        public Color Color { get; }
+        public IShader Shader { get; }
 
-        public Material(ShaderProgram program) : this(program, Color.White) { }
+        private readonly Dictionary<string, object> _properties = new Dictionary<string, object>();
 
-        public Material(ShaderProgram program, Color color)
+        public Material(IShader shader)
         {
-            Program = program;
-            Color = color;
+            Shader = shader;
+        }
+
+        public Material(IShader shader, Dictionary<string, object> properties) : this(shader)
+        {
+            _properties = properties;
+        }
+
+        public void SetProperty(string name, object value)
+        {
+            _properties[name] = value;
+        }
+
+        public void ApplyProperties()
+        {
+            Shader.Bind();
+            foreach(var property in _properties)
+                Shader.SetUniform(property.Key, property.Value);
         }
     }
 }

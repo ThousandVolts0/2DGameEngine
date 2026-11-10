@@ -1,8 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
-using Silk.NET.Input;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Engine.Content;
+using Microsoft.Extensions.Logging;
 
 namespace Engine.Core.Game.Abstractions
 {
@@ -10,17 +7,20 @@ namespace Engine.Core.Game.Abstractions
     {
         public ILogger<Game> Logger { get; }
         public SceneManager Scenes { get; }
+        public IResourceProvider Resources { get; }
         public GameInput Input { get; }
         public GameWindow Window { get; }
 
         public GameContext(
             ILogger<Game> logger, 
-            SceneManager sceneManager, 
+            SceneManager scenes, 
+            IResourceProvider resources,
             GameInput input,
             GameWindow window)
         {
             Logger = logger;
-            Scenes = sceneManager;
+            Resources = resources;
+            Scenes = scenes;
             Input = input;
             Window = window;
         }

@@ -1,11 +1,12 @@
 ﻿using Engine.Mathematics;
 using ImGuiNET;
+using Microsoft.Extensions.Logging;
 using Silk.NET.Maths;
 using Silk.NET.Windowing;
 
 namespace Engine.Core.Game.Abstractions
 {
-    public class GameWindow
+    public class GameWindow : IDisposable
     {
         public int Width => _window.Size.X;
         public int Height => _window.Size.Y;
@@ -23,12 +24,24 @@ namespace Engine.Core.Game.Abstractions
         public void SetSize(Vector2Int newSize) => _window.Size = (Vector2D<int>)newSize;
         public void SetWindowState(WindowState newState) => _window.WindowState = newState;
 
-        private IWindow _window;
-        public GameWindow(IWindow window)
+        private readonly IWindow _window;
+        private readonly ILogger<GameWindow> _logger;
+        public GameWindow(IWindow window, ILogger<GameWindow> logger)
         {
             _window = window;
-            _window.Move += (newPos) => OnMove?.Invoke((Vector2Int)newPos);
-            _window.Resize += (newSize) => OnResize?.Invoke((Vector2Int)newSize);
+            _logger = logger;
+
+            _window.Move += HandleMove;
+            _window.Resize += HandleResize;
+        }
+
+        private void HandleMove(Vector2D<int> pos) => OnMove?.Invoke((Vector2Int)pos);
+        private void HandleResize(Vector2D<int> size) => OnResize?.Invoke((Vector2Int)size);
+
+        public void Dispose()
+        {
+            _window.Move -= HandleMove;
+            _window.Resize -= HandleResize;
         }
     }
 }

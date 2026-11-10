@@ -1,37 +1,60 @@
-﻿using Engine.Content.Loaders;
+﻿using Engine.Content.Defaults;
+using Engine.Content.Loaders;
+using Engine.Data;
 
 namespace Engine.Content
 {
-    public static class Resources
+    public class Resources : IResourceProvider
     {
-        private static Dictionary<Type, object> _resourceLoaders = new Dictionary<Type, object>()
+        private readonly Dictionary<Type, object> _resourceLoaders;
+
+        private DefaultResources? _defaults = null;
+        public DefaultResources Defaults => _defaults
+            ?? throw new InvalidOperationException("Default resources have not been initialized yet");
+
+        public Resources(Dictionary<Type, object> resourceLoaders)
         {
-            { typeof(Texture), new ImageResourceLoader() }
-        };
+            _resourceLoaders = resourceLoaders;
+        }
+
+        public void InitializeDefaults()
+        {
+            if (_defaults != null)
+                throw new InvalidOperationException(
+                    "Default resources have already been initialized.");
+
+            DefaultMaterials defaultMaterials = new()
+            {
+                Unlit = Load<Material>("Defaults/Materials/unlit.mat")
+            };
+
+            _defaults = new(defaultMaterials);
+        }
 
         public static string GetResourcePath(string resourceName)
         {
-            resourceName = resourceName.Replace('\\', '/');
+            resourceName = resourceName.Replace('\\', '/'); 
 
-            if (resourceName.StartsWith("Resources/"))
+            if (resourceName.StartsWith("Resources/", StringComparison.OrdinalIgnoreCase))
                 resourceName = resourceName.Substring("Resources/".Length);
 
             return Path.Combine(AppContext.BaseDirectory, "Resources", resourceName);
         }
 
-        public static T Load<T>(string path) where T : class
+        public T Load<T>(string path) where T : class
         {
-            var loader = _resourceLoaders[typeof(T)] as IResourceLoader<T>;
+            var loader = (IResourceLoader<T>)_resourceLoaders[typeof(T)];
             if (loader == null)
                 throw new NotSupportedException($"No resource loader found for type {typeof(T).Name}");
 
             string resourcePath = GetResourcePath(path);
-            
 
             if (!File.Exists(resourcePath))
                 throw new FileNotFoundException($"Resource at path '{path}' not found.");
 
-            return loader.Load(resourcePath);
+            return loader.Load(resourcePath, this);
         }
+
+        public bool Exists(string path) => File.Exists(GetResourcePath(path));
     }
 }

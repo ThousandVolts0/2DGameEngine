@@ -1,24 +1,36 @@
 ﻿using Engine.Components;
+using Engine.Core.Game.Abstractions;
 
 namespace Engine.Core
 {
-    public class Scene
+    public abstract class Scene : IDisposable
     {
-        public string Name { get; set; } = "Scene";
-
         private Dictionary<int, Entity> _entities = new Dictionary<int, Entity>();
         private int _nextEntityId = 0;
+        private bool _isInitialized = false;
 
-        public Scene(string name = "Scene")
-        {
-            Name = name;
-        }
+        public Scene() { }
 
-        public Scene(List<Entity> entities, string name = "Scene") : this(name)
+        public Scene(List<Entity> entities)
         {
             foreach (Entity entity in entities)
                 AddEntity(entity);
         }
+
+        protected virtual void OnInitialize(GameContext ctx) { }
+        protected virtual void OnActivate(GameContext ctx) { }
+        protected virtual void OnDeactivate(GameContext ctx) { }
+
+        internal void Initialize(GameContext ctx)
+        {
+            if (_isInitialized) return; // Prevent re-initialization
+
+            OnInitialize(ctx);
+            _isInitialized = true;
+        }
+
+        internal void Activate(GameContext ctx) => OnActivate(ctx);
+        internal void Deactivate(GameContext ctx) => OnDeactivate(ctx);
 
         public Entity? GetEntityByName(string name) => _entities.Values.FirstOrDefault(e => e.Name == name);
         public Entity? GetEntityById(int id) => _entities.ContainsKey(id) ? _entities[id] : null;
@@ -39,16 +51,20 @@ namespace Engine.Core
             return components.AsReadOnly();
         }
 
-        public Scene AddEntity(Entity entity)
+        public void AddEntity(Entity entity) => _entities.Add(_nextEntityId++, entity);
+
+        public void RemoveEntity(Entity entity) => _entities.Remove(_entities.First(e => e.Value == entity).Key);
+
+        public void ClearEntities()
         {
-            _entities.Add(_nextEntityId++, entity);
-            return this;
+            _entities.Clear();
+            _nextEntityId = 0;
+            _isInitialized = false;
         }
 
-        public Scene RemoveEntity(Entity entity)
+        public void Dispose()
         {
-            _entities.Remove(_entities.First(e => e.Value == entity).Key);
-            return this;
+            ClearEntities();
         }
     }
 }

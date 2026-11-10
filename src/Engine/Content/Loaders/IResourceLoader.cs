@@ -2,6 +2,6 @@
 {
     public interface IResourceLoader<T>
     {
-        T Load(string path);
+        T Load(string path, IResourceProvider provider);
     }
 }

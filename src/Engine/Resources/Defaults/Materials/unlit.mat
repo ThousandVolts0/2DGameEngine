@@ -1,0 +1,6 @@
+{
+   "shader":"Defaults/Shaders/unlit.shader",
+   "properties":{
+      "color":"255,255,255,1"
+   }
+}

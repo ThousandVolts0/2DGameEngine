@@ -1,5 +1,5 @@
 ﻿using Engine.Core;
-using Engine.Core.Game;
+using Engine.Core.Game.Abstractions;
 
 namespace Engine.Components
 {

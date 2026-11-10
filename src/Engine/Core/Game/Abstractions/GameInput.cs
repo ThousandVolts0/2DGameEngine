@@ -33,10 +33,16 @@ namespace Engine.Core.Game.Abstractions
 
             SetActiveKeyboard(_context.Keyboards.FirstOrDefault());
             SetActiveMouse(_context.Mice.FirstOrDefault());
-            _context.ConnectionChanged += OnDeviceConnectionChanged;
+            _context.ConnectionChanged += HandleDeviceConnectionChanged;
+
+            if (_activeKeyboard == null)
+                _logger.LogWarning("No keyboard device connected on startup");
+
+            if (_activeMouse == null)
+                _logger.LogWarning("No mouse device connected on startup");
         }
 
-        private void OnDeviceConnectionChanged(IInputDevice device, bool status)
+        private void HandleDeviceConnectionChanged(IInputDevice device, bool status)
         {
             if (device == _activeKeyboard && !status) // Disable current keyboard and fallback to already connected device or none
             {
@@ -107,7 +113,7 @@ namespace Engine.Core.Game.Abstractions
 
         public void Dispose()
         {
-            _context.ConnectionChanged -= OnDeviceConnectionChanged;
+            _context.ConnectionChanged -= HandleDeviceConnectionChanged;
             SetActiveKeyboard(null);
             SetActiveMouse(null);
         }

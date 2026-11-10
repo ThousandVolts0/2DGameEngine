@@ -1,24 +1,69 @@
-﻿namespace Engine.Core
+﻿using Microsoft.Extensions.Logging;
+
+namespace Engine.Core
 {
-    public class SceneManager
+    public class SceneManager : IDisposable
     {
+        private readonly Dictionary<string, Scene> _registeredScenes = new();
         public Scene? ActiveScene { get; private set; }
         public event Action<Scene>? SceneActivated;
         public event Action<Scene>? SceneDeactivated;
 
-        public SceneManager(Scene activeScene)
+        private readonly ILogger<SceneManager> _logger;
+        public SceneManager(ILogger<SceneManager> logger)
         {
-            SetActiveScene(activeScene);
+            _logger = logger;
         }
 
-        public void SetActiveScene(Scene scene)
+        public void RegisterScene(Scene scene, string name)
         {
+            if (_registeredScenes.ContainsKey(name))
+            {
+                _logger.LogWarning($"Scene '{name}' is already registered.");
+                return;
+            }
+
+            _registeredScenes[name] = scene;
+            _logger.LogDebug($"Scene '{name}' registered.");
+        }
+
+        public void UnregisterScene(string name)
+        {
+            if (!_registeredScenes.ContainsKey(name))
+            {
+                _logger.LogWarning($"Scene '{name}' is not registered.");
+                return;
+            }
+            _registeredScenes.Remove(name);
+
+            _logger.LogDebug($"Scene '{name}' unregistered.");
+        }
+
+        public void SetSceneActive(string name)
+        {
+            if (!_registeredScenes.TryGetValue(name, out Scene? scene))
+            {
+                _logger.LogWarning($"Scene '{name}' is not registered.");
+                return;
+            }
+
             if (ActiveScene != null)
                 SceneDeactivated?.Invoke(ActiveScene);
 
             ActiveScene = scene;
 
             SceneActivated?.Invoke(ActiveScene);
+        }
+
+        public void Dispose()
+        {
+            foreach (var scene in _registeredScenes.Values)
+                scene.Dispose();
+
+            _registeredScenes.Clear();
+            ActiveScene = null;
+            SceneActivated = null; // Unsubscribe event handlers
+            SceneDeactivated = null; // Unsubscribe event handlers
         }
     }
 }

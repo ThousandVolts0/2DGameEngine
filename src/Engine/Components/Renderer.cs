@@ -7,10 +7,10 @@ namespace Engine.Components
 {
     public sealed class Renderer : Component
     {
-        public MeshRenderInfo Info { get; }
-        public Renderer(MeshRenderInfo info)
+        public IRenderable Renderable { get; }
+        public Renderer(IRenderable renderable)
         {
-            Info = info;
+            Renderable = renderable;
         }
     }
 }
