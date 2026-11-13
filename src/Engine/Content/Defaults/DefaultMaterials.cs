@@ -7,6 +7,11 @@ namespace Engine.Content.Defaults
 {
     public class DefaultMaterials
     {
-        public required Material Unlit { get; init; }
+        public UnlitMaterial Unlit => _unlit.Clone();
+        private readonly UnlitMaterial _unlit;
+        public DefaultMaterials(UnlitMaterial unlit)
+        {
+            _unlit = unlit;
+        }
     }
 }

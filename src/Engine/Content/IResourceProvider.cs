@@ -6,7 +6,7 @@ using Engine.Content.Defaults;
 
 namespace Engine.Content
 {
-    public interface IResourceProvider
+    public interface IResourceProvider : IDisposable
     {
         DefaultResources Defaults { get; }
         internal void InitializeDefaults();

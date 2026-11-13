@@ -1,5 +1,7 @@
 ﻿using Engine.Core;
 using Engine.Mathematics;
+using System.Numerics;
+using Vector2 = Engine.Mathematics.Vector2;
 
 namespace Engine.Components
 {
@@ -25,5 +27,10 @@ namespace Engine.Components
         }
 
         public Transform() { }
+
+        public Matrix4x4 WorldMatrix =>
+            Matrix4x4.CreateTranslation(Position.X, Position.Y, 0) *
+            Matrix4x4.CreateRotationZ(Rotation) *
+            Matrix4x4.CreateScale(Scale.X, Scale.Y, 1);
     }
 }

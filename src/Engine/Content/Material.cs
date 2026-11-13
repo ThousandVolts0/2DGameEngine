@@ -1,12 +1,15 @@
 ﻿using Engine.Graphics.Shaders;
+using Silk.NET.OpenGL;
+using System.Data.SqlTypes;
+using System.Drawing;
+using System.Numerics;
 
 namespace Engine.Data
 {
     public class Material
     {
-        public IShader Shader { get; }
-
-        private readonly Dictionary<string, object> _properties = new Dictionary<string, object>();
+        internal IShader Shader { get; }
+        protected readonly Dictionary<string, object> _properties = new Dictionary<string, object>();
 
         public Material(IShader shader)
         {
@@ -18,10 +21,28 @@ namespace Engine.Data
             _properties = properties;
         }
 
+        public virtual Material Clone() => new Material(Shader, _properties);
+
         public void SetProperty(string name, object value)
         {
             _properties[name] = value;
         }
+
+        public bool HasProperty<T>(string name) => TryGetProperty<T>(name, out _);
+
+        public bool TryGetProperty<T>(string name, out T? value)
+        {
+            if (_properties.TryGetValue(name, out object? obj) && obj is T result)
+            {
+                value = result;
+                return true;
+            }
+
+            value = default;
+            return false;
+        }
+
+        public IReadOnlyDictionary<string, object> GetProperties() => _properties.AsReadOnly();
 
         public void ApplyProperties()
         {

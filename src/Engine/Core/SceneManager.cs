@@ -18,34 +18,28 @@ namespace Engine.Core
         public void RegisterScene(Scene scene, string name)
         {
             if (_registeredScenes.ContainsKey(name))
-            {
-                _logger.LogWarning($"Scene '{name}' is already registered.");
-                return;
-            }
+                throw new InvalidOperationException($"Scene '{name}' is already registered.");
 
-            _registeredScenes[name] = scene;
+            _registeredScenes.Add(name, scene);
             _logger.LogDebug($"Scene '{name}' registered.");
         }
 
         public void UnregisterScene(string name)
         {
             if (!_registeredScenes.ContainsKey(name))
-            {
-                _logger.LogWarning($"Scene '{name}' is not registered.");
-                return;
-            }
-            _registeredScenes.Remove(name);
+                throw new InvalidOperationException($"Scene '{name}' is not registered.");
 
+            if (ActiveScene == _registeredScenes[name])
+                throw new InvalidOperationException($"Cannot unregister the active '{name}' scene, set another scene active first");
+
+            _registeredScenes.Remove(name);
             _logger.LogDebug($"Scene '{name}' unregistered.");
         }
 
         public void SetSceneActive(string name)
         {
             if (!_registeredScenes.TryGetValue(name, out Scene? scene))
-            {
-                _logger.LogWarning($"Scene '{name}' is not registered.");
-                return;
-            }
+                throw new InvalidOperationException($"Scene '{name}' is not registered.");
 
             if (ActiveScene != null)
                 SceneDeactivated?.Invoke(ActiveScene);
@@ -58,7 +52,10 @@ namespace Engine.Core
         public void Dispose()
         {
             foreach (var scene in _registeredScenes.Values)
-                scene.Dispose();
+            {
+                if (scene is IDisposable disposableScene)
+                    disposableScene.Dispose();
+            }
 
             _registeredScenes.Clear();
             ActiveScene = null;

@@ -3,9 +3,9 @@ using Engine.Core.Game.Abstractions;
 
 namespace Engine.Core
 {
-    public abstract class Scene : IDisposable
+    public abstract class Scene
     {
-        private Dictionary<int, Entity> _entities = new Dictionary<int, Entity>();
+        private readonly Dictionary<int, Entity> _entities = new Dictionary<int, Entity>();
         private int _nextEntityId = 0;
         private bool _isInitialized = false;
 
@@ -59,12 +59,6 @@ namespace Engine.Core
         {
             _entities.Clear();
             _nextEntityId = 0;
-            _isInitialized = false;
-        }
-
-        public void Dispose()
-        {
-            ClearEntities();
         }
     }
 }

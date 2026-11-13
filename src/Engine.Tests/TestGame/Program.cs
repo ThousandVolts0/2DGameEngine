@@ -5,9 +5,10 @@ using Engine.Core;
 using Engine.Core.Game;
 using Engine.Core.Game.Abstractions;
 using Engine.Rendering;
-using Engine.Rendering.Shapes;
-using Microsoft.Extensions.DependencyModel;
+using Engine.Mathematics;
 using Microsoft.Extensions.Logging;
+using System.Numerics;
+using Vector2 = Engine.Mathematics.Vector2;
 
 namespace TestGame
 {
@@ -25,7 +26,7 @@ namespace TestGame
                     settings.Logging.MinimumLevel = LogLevel.Debug;
                     settings.Logging.UseConsole = true;
                 })
-                .RegisterScene(new MainScene(), "Main")
+                .AddScene<MainScene>("Main")
                 .SetActiveScene("Main")
                 .Build();
 
@@ -37,14 +38,26 @@ namespace TestGame
     {
         protected override void OnInitialize(GameContext ctx)
         {
-            var playerShape = new Circle();
+            // Todo: maybe remove engine Vector2 and replace with
+            // System.Numerics.Vector2 for consistency
 
-            Entity player = new Entity("Player")
-                .Attach(new Transform())
-                .Attach(new Renderer(playerShape))
+            var material = ctx.Resources.Defaults.Materials.Unlit;
+            material.Color = new Vector4(1f, 1f, 1f, 1f);
+            var playerShape = new Triangle(material);
+
+            Vector2 pos = new(1, 0);
+            Vector2 scale = new(0.5f, 0.5f);
+            float rot = 0f;
+
+            Entity mainCam = new Entity("MainCamera")
                 .Attach(new Camera());
 
+            Entity player = new Entity("Player")
+                .Attach(new Transform(pos, scale, rot))
+                .Attach(new Renderer(playerShape));
+
             AddEntity(player);
+            AddEntity(mainCam);
         }
     }
 }

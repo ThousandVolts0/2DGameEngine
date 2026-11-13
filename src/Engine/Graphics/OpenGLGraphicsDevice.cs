@@ -13,10 +13,8 @@ namespace Engine.Graphics
 {
     public class OpenGLGraphicsDevice : IGraphicsDevice 
     {
-        public void Initialize(IWindow window) => _gl = window.CreateOpenGL();
-
         private readonly ILogger<OpenGLGraphicsDevice> _logger;
-        private Dictionary<Mesh, GPUMesh> _loadedMeshes = new();
+        private readonly Dictionary<Mesh, GPUMesh> _loadedMeshes = new();
         private GL _gl = null!;
 
         public OpenGLGraphicsDevice(ILogger<OpenGLGraphicsDevice> logger)
@@ -44,7 +42,7 @@ namespace Engine.Graphics
             return _loadedMeshes[data];
         }
 
-        public void Draw(Mesh mesh, Material material, Matrix4x4 proj)
+        public void Draw(Mesh mesh, Material material, RenderInfo info)
         {
             _logger.LogDebug("Drawing mesh: {Mesh} with material {Material}", mesh, material);
 
@@ -52,7 +50,11 @@ namespace Engine.Graphics
             IShader shader = material.Shader;
 
             shader.Bind();
-            shader.SetUniform<Matrix4x4>("projection", proj);
+            shader.SetUniform("u_Projection", info.Projection);
+            shader.SetUniform("u_Model", info.World);
+            shader.SetUniform("u_View", info.View);
+
+            material.ApplyProperties();
 
             _gl.BindVertexArray(gpuMesh.VAO);
             _gl.DrawElements(PrimitiveType.Triangles, (uint)mesh.Indices.Length, DrawElementsType.UnsignedInt, ReadOnlySpan<uint>.Empty);
@@ -70,14 +72,20 @@ namespace Engine.Graphics
             _gl.Viewport((int)view.X, (int)view.Y, (uint)view.Width, (uint)view.Height);
         }
 
-        public void Clear()
-        {
-            _gl.Clear(ClearBufferMask.ColorBufferBit);
-        }
+        public void Initialize(IWindow window) => _gl = window.CreateOpenGL();
+        public void Clear() => _gl.Clear(ClearBufferMask.ColorBufferBit);
+        public void SetClearColor(Color color) => _gl.ClearColor(color);
 
-        public void SetClearColor(Color color)
+        public void Dispose()
         {
-            _gl.ClearColor(color);
+            foreach (GPUMesh mesh in _loadedMeshes.Values)
+            {
+                _gl.DeleteVertexArray(mesh.VAO);
+                _gl.DeleteBuffer(mesh.VBO);
+                _gl.DeleteBuffer(mesh.EBO);
+            }
+
+            _loadedMeshes.Clear();
         }
 
         private uint CreateVAO()

@@ -72,8 +72,11 @@ namespace Engine.Graphics.Shaders
                 case Vector3 v3:
                     _gl.Uniform3(GetUniformLocation(name), v3);
                     break;
+                case Vector4 v4:
+                    _gl.Uniform4(GetUniformLocation(name), v4);
+                    break;
                 case Matrix4x4 m4:
-                    _gl.UniformMatrix4(GetUniformLocation(name), 1, false, ref m4.M11);
+                    _gl.UniformMatrix4(GetUniformLocation(name), 1, true, ref m4.M11);
                     break;
                 default:
                     throw new Exception($"Unsupported property type: {value?.GetType()}");

@@ -25,5 +25,16 @@ namespace Engine.Components
 
             return Matrix4x4.CreateOrthographicOffCenter(left, right, bottom, top, NearPlane, FarPlane);
         }
+
+        public Matrix4x4 GetViewMatrix(Transform? transform = null)
+        {
+            if (transform == null)
+                return Matrix4x4.Identity;
+
+            if (!Matrix4x4.Invert(transform.WorldMatrix, out Matrix4x4 res))
+                throw new InvalidOperationException("Transform is not invertible");
+
+            return res;
+        }
     }
 }

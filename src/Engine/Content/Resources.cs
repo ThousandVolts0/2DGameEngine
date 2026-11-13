@@ -23,11 +23,10 @@ namespace Engine.Content
                 throw new InvalidOperationException(
                     "Default resources have already been initialized.");
 
-            DefaultMaterials defaultMaterials = new()
-            {
-                Unlit = Load<Material>("Defaults/Materials/unlit.mat")
-            };
+            Material unlitLoaded = Load<Material>("Defaults/Materials/unlit.mat");
+            UnlitMaterial unlitMat = new(unlitLoaded.Shader, new(unlitLoaded.GetProperties()));
 
+            DefaultMaterials defaultMaterials = new(unlitMat);
             _defaults = new(defaultMaterials);
         }
 
@@ -56,5 +55,17 @@ namespace Engine.Content
         }
 
         public bool Exists(string path) => File.Exists(GetResourcePath(path));
+
+        public void Dispose()
+        {
+            foreach (var loader in _resourceLoaders.Values)
+            {
+                if (loader is IDisposable disposableLoader)
+                    disposableLoader.Dispose();
+            }
+
+            _resourceLoaders.Clear();
+            _defaults = null;
+        }
     }
 }

@@ -27,10 +27,11 @@ namespace Engine.Content.Loaders
 
             IShader shader = provider.Load<IShader>(shaderPath);
 
-            Dictionary<string, object> properties = JsonSerializer.Deserialize<Dictionary<string, object>>(root.GetProperty("properties"))!;
-            _logger.LogDebug("Loaded material from {Path} with shader {ShaderPath}", path, shaderPath);
+            // todo: add properties parse from file to shader
+            //Dictionary<string, object> properties = JsonSerializer.Deserialize<Dictionary<string, object>>(root.GetProperty("properties"))!;
+            //_logger.LogDebug("Loaded material from {Path} with shader {ShaderPath}", path, shaderPath);
 
-            return new Material(shader, properties);
+            return new Material(shader);
         }
     }
 }

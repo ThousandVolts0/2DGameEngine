@@ -14,14 +14,14 @@ namespace Engine.Core.Game
     {
         private readonly GameSettings _settings = new();
         private readonly Dictionary<string, Scene> _scenes = new();
-        private string _activeSceneId = "";
+        private string? _activeSceneId = null;
 
-        public GameBuilder RegisterScene(Scene scene, string name)
+        public GameBuilder AddScene<T>(string name) where T : Scene, new()
         {
             if (_scenes.ContainsKey(name))
                 throw new ArgumentException($"Scene '{name}' is already registered.");
 
-            _scenes[name] = scene;
+            _scenes[name] = new T();
             return this;
         }
 

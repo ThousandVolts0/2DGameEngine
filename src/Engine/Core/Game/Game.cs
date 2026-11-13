@@ -7,13 +7,13 @@ using Silk.NET.Input;
 using Silk.NET.Maths;
 using Silk.NET.Windowing;
 using System.Drawing;
-using System.Resources;
 
 namespace Engine.Core.Game
 {
     public sealed class Game : IDisposable
     {
         public GameSettings Settings { get; }
+        public GameState State { get; private set; } = GameState.Created;
         
         private readonly IWindow _window;
         private readonly RenderPipeline _renderPipeline;
@@ -51,10 +51,13 @@ namespace Engine.Core.Game
 
         public void Run()
         {
+            if (State != GameState.Created) 
+                throw new InvalidOperationException("Game has already been started");
+
             _window.Load += OnLoad;
             _window.Update += OnUpdate;
             _window.Render += OnRender;
-            _window.Closing += OnClose;
+            _window.Closing += OnClosing;
             _window.Resize += OnResize;
 
             _window.Run();
@@ -63,7 +66,7 @@ namespace Engine.Core.Game
 
         private void OnLoad()
         {
-            _logger.LogDebug("Window loaded");
+            State = GameState.Loading;
 
             _input = _window.CreateInput();
 
@@ -77,13 +80,16 @@ namespace Engine.Core.Game
                 inputApi,
                 windowApi);
 
-            _scenes.SceneActivated += LoadScene;
-            _scenes.SceneDeactivated += scene => scene.Deactivate(_context);
-            _scenes.SetSceneActive(_startSceneId);
-
             _graphicsDevice.Initialize(_window);
             _graphicsDevice.SetClearColor(Color.CornflowerBlue);
             _resources.InitializeDefaults();
+
+            _scenes.SceneActivated += LoadScene;
+            _scenes.SceneDeactivated += scene => scene.Deactivate(_context);
+
+            _scenes.SetSceneActive(_startSceneId);
+
+            State = GameState.Running;
         }
 
         private void LoadScene(Scene scene)
@@ -106,9 +112,9 @@ namespace Engine.Core.Game
                 _renderPipeline.Render(_scenes.ActiveScene);
         }
 
-        private void OnClose()
+        private void OnClosing()
         {
-
+            Dispose();
         }
 
         private void OnResize(Vector2D<int> newSize)
@@ -118,14 +124,30 @@ namespace Engine.Core.Game
 
         public void Dispose()
         {
+            if (State == GameState.Disposed) 
+                throw new InvalidOperationException("Game already disposed");
+
+            State = GameState.Disposed;
+
             _loggerFactory.Dispose();
 
             _context?.Input.Dispose();
             _context?.Window.Dispose();
+
+            _resources.Dispose();
+            _graphicsDevice.Dispose();
 
             _scenes.Dispose();
             _input?.Dispose();
         }
     }
 
+    public enum GameState
+    {
+        Created,
+        Loading,
+        Running,
+        Stopped,
+        Disposed
+    }
 }

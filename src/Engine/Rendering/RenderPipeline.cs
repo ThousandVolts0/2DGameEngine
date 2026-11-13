@@ -5,8 +5,8 @@ using Engine.Data;
 using Engine.Graphics;
 using Microsoft.Extensions.Logging;
 using Silk.NET.Windowing;
-using System.ComponentModel;
 using System.Drawing;
+using System.Numerics;
 
 namespace Engine.Rendering
 {
@@ -15,8 +15,8 @@ namespace Engine.Rendering
         private readonly IGraphicsDevice _graphicsDevice;
         private readonly IWindow _window;
         private readonly IResourceProvider _resources;
-
         private readonly ILogger<RenderPipeline> _logger;
+
         public RenderPipeline(
             IGraphicsDevice graphicsDevice, 
             IWindow window,
@@ -31,20 +31,40 @@ namespace Engine.Rendering
 
         public void Render(Scene scene)
         {
-            foreach (Camera camera in scene.GetComponentsOfTypeInEntities<Camera>())
-            {
-                Size windowSize = new Size(_window.Size.X, _window.Size.Y);
-                Viewport newViewport = camera.ViewRectangle * windowSize;
-                _graphicsDevice.SetViewport(newViewport);
+            IReadOnlyList<Camera> cameras = scene.GetComponentsOfTypeInEntities<Camera>();
+            IReadOnlyList<Renderer> renderers = scene.GetComponentsOfTypeInEntities<Renderer>();
 
-                foreach (Renderer renderer in scene.GetComponentsOfTypeInEntities<Renderer>())
-                {
-                    Mesh mesh = renderer.Renderable.Mesh;
-                    Material material = renderer.Renderable.Material ?? _resources.Defaults.Materials.Unlit;
-                    _graphicsDevice.Draw(mesh, material, camera.GetProjectionMatrix(windowSize));
-                }
-                   
+            foreach (Camera camera in cameras)
+            {
+                UpdateViewport(camera);
+
+                foreach (Renderer renderer in renderers)
+                    Render(renderer, camera);
             }
+        }
+
+        private Size GetWindowSize() => new Size(_window.Size.X, _window.Size.Y);
+
+        private void Render(Renderer renderer, Camera camera)
+        {
+            Transform? entityTransform = renderer.Entity.GetComponent<Transform>();
+            Transform? cameraTransform = camera.Entity.GetComponent<Transform>();
+
+            Mesh mesh = renderer.Renderable.Mesh;
+            Material material = renderer.Renderable.Material ?? _resources.Defaults.Materials.Unlit; // Fallback to default material if none specified
+
+            Matrix4x4 world = entityTransform != null ? entityTransform.WorldMatrix : Matrix4x4.Identity;
+            Matrix4x4 view = camera.GetViewMatrix(cameraTransform);
+            Matrix4x4 proj = camera.GetProjectionMatrix(GetWindowSize());
+
+            RenderInfo info = new(world, view, proj);
+            _graphicsDevice.Draw(mesh, material, info);
+        }
+
+        private void UpdateViewport(Camera camera)
+        {
+            Viewport newViewport = camera.ViewRectangle * GetWindowSize();
+            _graphicsDevice.SetViewport(newViewport);
         }
     }
 }

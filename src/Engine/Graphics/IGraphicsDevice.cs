@@ -10,7 +10,7 @@ using System.Numerics;
 
 namespace Engine.Graphics
 {
-    public interface IGraphicsDevice
+    public interface IGraphicsDevice : IDisposable
     {
         void SetClearColor(Color color);
         void Clear();
@@ -18,6 +18,6 @@ namespace Engine.Graphics
         void SetViewport(Viewport view);
         IShader CreateShader(ShaderSource source);
 
-        void Draw(Mesh mesh, Material material, Matrix4x4 proj);
+        void Draw(Mesh mesh, Material material, RenderInfo info);
     }
 }
