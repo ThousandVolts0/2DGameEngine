@@ -51,7 +51,7 @@ namespace Engine.Graphics
 
             shader.Bind();
             shader.SetUniform("u_Projection", info.Projection);
-            shader.SetUniform("u_Model", info.World);
+            shader.SetUniform("u_Model", info.Model);
             shader.SetUniform("u_View", info.View);
 
             material.ApplyProperties();

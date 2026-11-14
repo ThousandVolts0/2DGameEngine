@@ -53,7 +53,7 @@ namespace Engine.Rendering
             Mesh mesh = renderer.Renderable.Mesh;
             Material material = renderer.Renderable.Material ?? _resources.Defaults.Materials.Unlit; // Fallback to default material if none specified
 
-            Matrix4x4 world = entityTransform != null ? entityTransform.WorldMatrix : Matrix4x4.Identity;
+            Matrix4x4 world = entityTransform != null ? entityTransform.ModelMatrix : Matrix4x4.Identity;
             Matrix4x4 view = camera.GetViewMatrix(cameraTransform);
             Matrix4x4 proj = camera.GetProjectionMatrix(GetWindowSize());
 

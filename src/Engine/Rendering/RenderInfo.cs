@@ -4,13 +4,13 @@ namespace Engine.Rendering
 {
     public class RenderInfo
     {
-        public Matrix4x4 World { get; }
+        public Matrix4x4 Model { get; }
         public Matrix4x4 View { get; }
         public Matrix4x4 Projection { get; }
 
-        public RenderInfo(Matrix4x4 world, Matrix4x4 view, Matrix4x4 proj)
+        public RenderInfo(Matrix4x4 model, Matrix4x4 view, Matrix4x4 proj)
         {
-            World = world;
+            Model = model;
             View = view;
             Projection = proj;
         }

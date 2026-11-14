@@ -31,7 +31,7 @@ namespace Engine.Components
             if (transform == null)
                 return Matrix4x4.Identity;
 
-            if (!Matrix4x4.Invert(transform.WorldMatrix, out Matrix4x4 res))
+            if (!Matrix4x4.Invert(transform.ModelMatrix, out Matrix4x4 res))
                 throw new InvalidOperationException("Transform is not invertible");
 
             return res;

@@ -28,7 +28,7 @@ namespace Engine.Components
 
         public Transform() { }
 
-        public Matrix4x4 WorldMatrix =>
+        internal Matrix4x4 ModelMatrix =>
             Matrix4x4.CreateTranslation(Position.X, Position.Y, 0) *
             Matrix4x4.CreateRotationZ(Rotation) *
             Matrix4x4.CreateScale(Scale.X, Scale.Y, 1);

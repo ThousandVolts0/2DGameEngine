@@ -15,10 +15,10 @@ namespace Engine.Graphics.Shaders
         {
             _gl = gl;
             Handle = _gl.CreateProgram();
-            LinkShaders(frag, vert);
+            LinkShaders(vert, frag);
         }
 
-        private void LinkShaders(uint frag, uint vert)
+        private void LinkShaders(uint vert, uint frag)
         {
             _gl.AttachShader(Handle, vert);
             _gl.AttachShader(Handle, frag);
@@ -76,7 +76,7 @@ namespace Engine.Graphics.Shaders
                     _gl.Uniform4(GetUniformLocation(name), v4);
                     break;
                 case Matrix4x4 m4:
-                    _gl.UniformMatrix4(GetUniformLocation(name), 1, true, ref m4.M11);
+                    _gl.UniformMatrix4(GetUniformLocation(name), 1, false, ref m4.M11);
                     break;
                 default:
                     throw new Exception($"Unsupported property type: {value?.GetType()}");

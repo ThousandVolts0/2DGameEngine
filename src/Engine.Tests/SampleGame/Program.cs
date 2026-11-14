@@ -41,12 +41,15 @@ namespace TestGame
             // Todo: maybe remove engine Vector2 and replace with
             // System.Numerics.Vector2 for consistency
 
+            // Todo: maybe make scene manager hold scene type and
+            // when u load it creates instance and calls OnInitialize
+
             var material = ctx.Resources.Defaults.Materials.Unlit;
             material.Color = new Vector4(1f, 1f, 1f, 1f);
             var playerShape = new Triangle(material);
 
-            Vector2 pos = new(1, 0);
-            Vector2 scale = new(0.5f, 0.5f);
+            Vector2 pos = new(0, 0f);
+            Vector2 scale = new(1f, 1f);
             float rot = 0f;
 
             Entity mainCam = new Entity("MainCamera")
