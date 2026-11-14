@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="samples/Conduit.Samples.BasicGame/Conduit.Samples.BasicGame.csproj" />
+  <Project Path="src/Conduit.Editor/Conduit.Editor.csproj" />
+  <Project Path="src/Conduit.Engine/Conduit.Engine.csproj" />
+  <Project Path="tests/Conduit.Engine.Tests/Conduit.Engine.Tests.csproj" />
+</Solution>
